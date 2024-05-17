@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Торсіон емуляція</title>
+	<!-- встановлення бібліотек (перша бібліотека важлива, бо надає працювати змінити мову)-->
+	<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+	<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+	    <style type="text/css">
+ 	
+	    	/*колір сторінки*/
+	    	body {
+				background-color: #f7f7f7;
+				}
+			/*рамка*/
+			.main {
+				height: 1200px;
+				width: 95%;
+				max-width: 1200px;
+				margin: auto;
+				/*background-color: red;*/  /*код (красне освітлення)подивитися на рамку*/
+			}
+			/*в середені рамок*/
+			.block {
+				border-radius: 20px;
+				margin: 4px;
+				padding: 13px;
+				box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+				background-color: white;
+			}
+
+			.container {
+				justify-content: center;
+			}			
+			.row {
+				display: flex;
+				flex-direction: row;
+				}
+			.column {
+				display: flex;
+				flex-direction: column;
+			}
+			/*по середині галочку яка стане кнопкою для переключання*/
+			.language {
+				align-items: center;
+			}
+
+			.switch {
+				position: relative;
+				display: inline-block;
+				width: 60px;
+				height: 34px;
+				margin: 0 10px;
+  			}
+  			.switch input {
+				opacity: 0;
+				width: 0;
+				height: 0;
+  			 }
+			/*рамка для кнопки (прямокутна)*/
+  			  .switch_slider {
+				position: absolute;
+				cursor: pointer;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: #ccc;
+				-webkit-transition: .4s;
+				transition: .4s;
+  			 }
+  			  /* Rounded sliders */
+  			  /* Робить заукруглення рамки для кнопки */
+  			.switch_slider.round {
+				border-radius: 34px;
+ 			 }
+  			.switch_slider.round:before {
+				border-radius: 50%;
+			 }
+			/*Створює кнопку(круглий ползунок) для рамки*/
+  			.switch_slider:before {
+				position: absolute;
+				content: "";
+				height: 26px;
+				width: 26px;
+				left: 4px;
+				bottom: 4px;
+				background-color: white;
+				-webkit-transition: .4s;
+				transition: .4s;
+  			}
+	   
+			/* Робить світіння кнопки при натисканні*/
+			input:checked + .switch_slider {
+				background-color: #2196F3;
+  			 }
+  			input:focus + .switch_slider {
+				box-shadow: 0 0 1px #2196F3;
+  			 }
+  			/* Змінює положення кнопки при натисканні*/
+  			 input:checked + .switch_slider:before {
+				-webkit-transform: translateX(26px);
+				-ms-transform: translateX(26px);
+				transform: translateX(26px);
+  			}
+  			/* Текст*/
+  			h1 { 
+				font-family: 'Times New Roman', Times, serif; /* Гарнитура текста */ 
+   		 		font-size: 250%; /* Размер шрифта в процентах */ 
+  				display: block;
+  				font-size: 2em;
+  				margin-top: 0.20em;
+  				margin-bottom: 0.20em;
+  				font-weight: inherit;
+  				line-height: 1.1;
+   				text-align: center; 
+   				/*color: #c00000; */
+   				
+			}
+	  		/*Зображення*/
+	  		.imgs{
+	  			margin: 5px;
+	  			/* 
+	  			border: 1px solid red;
+	  			float: left;
+	  			*/
+	  			width: 640px 	
+	  		}
+	  		/*Зображення які рухаються*/
+	  		.img_прилад {
+	  			position:relative;
+			}
+	        .img_градус {
+	        	position:relative;
+	        	height: 129px;
+		    	width: 147px;
+		    	transform: translateX(-182px) translateY(7px);
+	        }
+	        .img_стрілка {
+	        	position:relative;
+				height: 13px;
+		    	width: 146px;
+	        	transform: translateX(-331px) translateY(79px) rotate(32deg);	
+	        }
+	        .img_важель {
+	        	position:relative;
+	        	width: 164px;
+	        	height: 164px;
+	        	transform: translateX(-483px) translateY(3px) rotate(32deg);
+	        }
+	        .img_мала_стрілка {
+	        	position:relative;
+	        	height: 17px;
+		    	width: 3px;
+		    	transform: translateX(-569px) translateY(143px);
+	        }
+	        .img_ваги {
+	        	position:relative;
+	        	height: 48px;
+	        	width: 26px;
+	        	transform: translateX(-557px) translateY(82px);
+	        }        
+	        .img_столик {
+	        	position:relative;
+	        	height: 129px;
+	        	width: 135px;
+	        	transform: translateX(-615px) translateY(191px);
+	        	opacity: 0;
+	        }
+	        .img_рухома_частина_столика {
+	        	position:relative;
+	        	height: 93px;
+	        	width: 73px;
+	        	transform: translateX(-489px) translateY(149px);
+	        	opacity: 0;
+	        }
+	        .img_ваги_з_краплею {
+	        	position:relative;
+	        	height: 52px;
+	        	width: 26px;
+	        	transform: translateX(-718px) translateY(73px);
+	        	opacity: 0;
+	        }
+	        /*нажемні кнопки*/
+	        .indentation_between_buttons{
+				margin: 9px;
+			}
+			/*табличка*/
+			table, th {
+	 			border:2px solid black;
+	 			font-family: 'Times New Roman', Times, serif; /* Гарнитура текста */ 
+	    		font-size: 120%; /* Размер шрифта в процентах */
+				}
+			 td{
+			 	border:2px solid black;
+			 	font-family: 'Times New Roman', Times, serif; /* Гарнитура текста */ 
+	    		font-size: 120%; /* Размер шрифта в процентах */
+	    		text-align: center;
+			 }
+
+    	</style>
+
+<script type="text/javascript">
+	
+	function insertText_dt (valio, id) {
+    	document.getElementById(id).innerHTML = valio;
+	}
+
+	var vukonanna_function = 0
+
+    	function vstanovlena_vukonana_function(valio){
+    		vukonanna_function = valio
+    	}
+
+    	var P = 0
+		var global_flag = 0
+		
+		function obrabotka(Flag){
+	    	if (vukonanna_function === 0) {
+	    		global_flag = Flag
+	    		if(Flag === 0){
+	    			P = 0
+	    			prozorict(Flag)
+	    		}else if(Flag === 1){
+	    			P = 291
+	    			prozorict(Flag)
+	    		}else if(Flag === 2){
+	    			P = 257
+	    			prozorict(Flag)
+	    		}
+	    	} else {console.log("Дану рідину покищо змінити нельзя")}
+	    	
+	    }
+	function obchuslena(){
+	    	if (global_flag > 0) {
+	    		if (vukonanna_function === 0){
+	    			vstanovlena_vukonana_function(1)
+	    			let random_int
+	    			let F 
+	    			let chac_zatrumku
+	    			chac_zatrumku = 0
+	    			if (global_flag === 1){
+	    				random_int = getRandomInt(8)
+	    				F = P + random_int
+	    			}else if (global_flag === 2){
+	    				random_int = getRandomInt(11)
+	    				F = P + random_int
+	    			}else if(global_flag === 0){
+	    				F = 0
+	    			}else{
+	    				console.log("помилка це немало спрацювати")
+	    			}
+	    			let piduom = -20
+	    			setTimeout (qpi, chac_zatrumku,0)
+	    			setTimeout (strilkaVnutri, chac_zatrumku,0)
+	    			setTimeout(prozorict, chac_zatrumku ,1)
+	    			//вотут
+	    			chac_zatrumku = ctolik(-1,chac_zatrumku)
+	    			global_ctrilka_vnytri = -118
+	    			//setTimeout(визов функції, час затримки у мілісекундах, параметр функції)    	 	
+	    			chac_zatrumku = rux_ctrilok (1, F,chac_zatrumku,10,1)
+	    			setTimeout(prozorict, chac_zatrumku ,0)
+	    			chac_zatrumku =  ctolik(1,chac_zatrumku)
+	    	  		setTimeout (insertTextZnatchena, chac_zatrumku,F)
+	    	  		setTimeout (strilkaVnutri, chac_zatrumku,-1)
+	    	  		//-416
+	    	  		//во тут проблема ________________________________________________________________________________________________________
+	    	  		//setTimeout (Vagiv, chac_zatrumku,piduom,-236,-196)
+	    	  		//setTimeout (Vagiv, chac_zatrumku,-piduom,-436,-396)
+
+	    	  		// Урызаний функціонал
+	    	  		//setTimeout(prozorict, chac_zatrumku ,1)
+	    	  		//chac_zatrumku = rux_ctrilok (-1, F,chac_zatrumku,10,0)
+	    			setTimeout (vstanovlena_vukonana_function, chac_zatrumku,0)
+	    		}else{console.log("Функція ще виконується")}    
+
+	    	} else {console.log("Не встановлена рiдина")}
+	    }
+	    var pidyom_ruxomogo_stola = 8;
+	    function ctolik(znak,chas){
+	    	let chac_zatrumku
+	    	//i грає роль підіймання столика важливо ____________________________________________________________________________________
+	    	for (var i = 1; i < pidyom_ruxomogo_stola; i++) {
+	    			let zatrumka = 100
+	    			chac_zatrumku = zatrumka * i
+	    			chac_zatrumku = chac_zatrumku + chas
+	  	    		setTimeout (pidyom, chac_zatrumku,znak*(i))
+	  	    	//5,040 з чимось секунди
+	    		}
+	    	return chac_zatrumku
+	    }
+
+	    function qpi(namber){
+	    	let qpi = namber*(90+32)/-250
+			qpi = qpi+32
+			if(qpi < -212){
+	    		qpi = -212
+	    	}else if(qpi > 32){
+	    		qpi = 32
+	    	}else{}
+	    	rotateElem(qpi)
+	    }
+        function rotateElem( valio ) {
+            document.querySelector('.img_стрілка').style.transform ='translateX(-331px) translateY(79px) rotate('+valio+'deg)';
+            document.querySelector('.img_важель').style.transform = 'translateX(-483px)  translateY(3px) rotate('+valio+'deg)';             
+        }
+        var global_ctoluka = 149;
+        function pidyom(valio){
+        	//max 24
+        	global_ctoluka = global_ctoluka + valio
+        	ctoluk_max = global_ctoluka + 32
+        	ctoluk_min = global_ctoluka - 32
+        	if( global_ctoluka > ctoluk_max){
+        		global_ctoluka = 149
+        	}else if( global_ctoluka < ctoluk_min){
+        		global_ctoluka = ctoluk_min
+        	}else{
+        		
+        	}
+        	document.querySelector('.img_рухома_частина_столика').style.transform = ' translateX(-489px) translateY('+global_ctoluka+'px) ';
+        }
+
+        function prozorict(valio){
+        	document.querySelector('.img_рухома_частина_столика').style.opacity = 1;
+            document.querySelector('.img_столик').style.opacity = 1;
+            if (valio === 0) {
+            	document.querySelector('.img_ваги').style.opacity = 0;
+            	document.querySelector('.img_ваги_з_краплею').style.opacity = 1;
+            }else if(valio > 0){
+            	document.querySelector('.img_ваги').style.opacity = 1;
+            	document.querySelector('.img_ваги_з_краплею').style.opacity = 0;
+            }
+
+        }
+     
+	    var global_vag = 82;//img_ваги translateY()
+	    var global_vag2 = 73;//img_ваги_з_краплею translateY()
+
+	    function Vagiv(valio,max,min){
+	    	let namber = 0
+	      	if(global_flag > 0){
+	    		namber = global_vag
+	    	} else if(global_flag === 0){
+	    		namber = global_vag2
+	    	}else{
+	    		console.log("помилка це немало спрацювати")
+	    	}
+	    	namber = namber + valio
+	    	if (namber < max) {
+	    		namber = max
+	    	}else if ( namber > min) {
+	    		namber = min
+	    	}else{}
+	    	//Вотут змінити нада якщо міняє
+	    	if(global_flag > 0){
+	    		global_vag = namber
+	    		document.querySelector('.img_ваги').style.transform = ' translateX(-557px) translateY('+global_vag+'px)  ';
+	    	} else if(global_flag === 0){
+	    		global_vag2 = namber
+	    		document.querySelector('.img_ваги_з_краплею').style.transform = ' translateX(-718px) translateY(73px) ';
+	    	}else{
+	    		console.log("помилка це немало спрацювати")
+	    	}
+	    	
+
+		    }
+
+	    function getRandomInt(max) {
+  			return Math.floor(Math.random() * max);
+			}
+
+			var klik_id_1 = 1
+			var klik_id_2 = 1
+
+			function insertTextZnatchena(namber){
+				if (global_flag === 1){
+					if(klik_id_1 < 11){
+						let stroka = "1_"+klik_id_1
+						insertText_dt(namber,stroka)
+						klik_id_1++
+					}
+											
+				}else if (global_flag === 2) {
+					if(klik_id_2 < 11){
+						let stroka = "2_"+klik_id_2
+						insertText_dt(namber,stroka)
+						klik_id_2++
+					}
+				}else{
+					console.log("помилка це немало спрацювати")
+				}
+			}
+
+			function insertText_dt (valio, id) {
+    			document.getElementById(id).innerHTML = valio;
+				}
+
+				let global_ctrilka_vnytri = -569
+				let max_c_v = global_ctrilka_vnytri + 10
+				let min_c_v = global_ctrilka_vnytri - 10
+
+				function strilkaVnutri(dowguna) {
+					
+
+					let dodanok = 0.63
+					if (dowguna > 0) {
+						if(global_ctrilka_vnytri < max_c_v){
+							global_ctrilka_vnytri = global_ctrilka_vnytri + dodanok
+						}else{
+							global_ctrilka_vnytri = max_c_v
+						}
+					}else if (dowguna < 0) {
+						if (global_ctrilka_vnytri > min_c_v) {
+							global_ctrilka_vnytri = global_ctrilka_vnytri - dodanok
+						}else {
+							global_ctrilka_vnytri = min_c_v
+						}
+					}else if(dowguna === 0){
+						global_ctrilka_vnytri = -569
+					}else{
+						console.log("помилка це немало спрацювати")
+					}
+					ctrilka_wnytri(global_ctrilka_vnytri)
+					}
+
+				function ctrilka_wnytri(valio) {
+					document.querySelector('.img_мала_стрілка').style.transform = 'translateX('+valio+'px)  translateY(143px) ';
+				}
+
+				function obchuslena_2(){
+
+					let znatchena = 1
+					if (global_flag > 0) {
+						if (vukonanna_function === 0){
+						if (global_flag > 0) {
+							global_ctrilka_vnytri = min_c_v
+							strilkaVnutri(1)
+							prozorict(0)
+							Kraplevi_vagu(-3)
+							if (global_flag === 1) {
+								rutchag(18, 100)
+							}else if (global_flag === 2){
+								rutchag(19, 100)
+							}else{
+								console.log("помилка це немало спрацювати")
+							}
+						}
+						vstanovlena_vukonana_function(znatchena)
+						}else{console.log("Функція ще виконується")}
+					} else {
+						console.log("Не встановлена рідина")
+					}
+					
+				}
+				// Волошина Анна Олександрівна з ВНТУ дуже погана девочка з 1 АКІТ-18б
+				//цей код поганий, як вказаноа особа вище
+				function Kraplevi_vagu(pidyom){
+					let flagok = global_flag
+					global_flag = 0
+					Vagiv(pidyom,-436,-396)
+					global_flag = flagok
+				}
+				
+				function rutchag(F,chas){
+					let tayming 
+					let chac_zatrumku
+					tayming = rux_ctrilok( 1, F,chas ,100 ,1,1)
+					chac_zatrumku = tayming + 10
+					setTimeout (insertText_dt, chac_zatrumku,F,global_flag)
+					chac_zatrumku += 1000
+					setTimeout (Kraplevi_vagu, chac_zatrumku,100)				
+					//setTimeout (rux_ctrilok, chac_zatrumku,-1, F,chas,100,0)
+					//setTimeout(prozorict, chac_zatrumku ,1)
+					chac_zatrumku += tayming
+					//setTimeout (qpi, chac_zatrumku,0)
+					setTimeout (strilkaVnutri, chac_zatrumku,0)
+					setTimeout (vstanovlena_vukonana_function, chac_zatrumku,0)
+					}
+
+					function rux_ctrilok( rux, F,chas, zatrumka, strilochka ){
+					let tayming
+					let chac_zatrumku
+						for (var i = 1; i <= F; i++) {
+	    					chac_zatrumku = zatrumka * i
+	    					chac_zatrumku = chac_zatrumku + chas
+	    					if (rux > 0) {
+								setTimeout (qpi, chac_zatrumku,i)
+								if (i < 16) {
+									setTimeout (strilkaVnutri, chac_zatrumku,strilochka)
+								}
+	    						
+	    					} else if(rux < 0){
+	    						setTimeout (qpi, chac_zatrumku,F-i)
+	    						setTimeout (strilkaVnutri, chac_zatrumku,0)
+	    					}else{
+	    						console.log ("помилка це немало спрацювати")
+	    					}
+	    					tayming = chac_zatrumku
+						}
+						return tayming
+					}
+
+
+</script>
+
+</head>
+
+<body>
+
+	<header>
+		<h1 id="titleText">STUDY OF SURFACE TENSION OF THE LIQUID</h1>
+	</header>
+
+  	<div class="main column">
+		<div class="container column">
+			<!-- встановлення кнопки для мови -->
+			<div class="language block row">
+				<p>English</p>
+				<label class="switch">
+					<input id="language_switch" type="checkbox">
+					<span class="switch_slider round"></span>
+				</label>
+				<p>Українська</p>
+			</div>
+			<div class="block row">
+					<img src="Скрін1_1.png" class="imgs" id="i1">
+    				<img src="Скрін2_1.png" class="imgs" id="i2">
+    				<img src="Скрін3.png" class="imgs">
+			</div>
+			<!-- встановлення кнопок які впливають на зображення -->
+			<div class="block row">
+				<button onclick="obrabotka(1)" class="indentation_between_buttons" id="b1">
+       	 			Distilled water
+    			</button>
+    			<button onclick="obrabotka(2)" class="indentation_between_buttons" id="b2">
+        			Alcohol
+    			</button>
+			</div>
+			<div class="block row">
+				<button onclick="obchuslena()" class="indentation_between_buttons" id="b3">
+        			Tension force
+    			</button>
+    			<button onclick="obchuslena_2()" class="indentation_between_buttons" id="b4">
+        			Weight of drop
+    			</button>
+			</div>
+			<!-- встановлення зображень які змінюються під час натискання кнопок -->
+			<div class="block row">
+				<!-- <div id=""> <img src="назва і розширення зображення" class="CSS стилля" > </div> -->
+				<!-- допомагає дана код накладувати зображення одне на одне -->
+				<img src="Bodi.png" class="img_прилад" >
+				<img src="Scale.png"class="img_градус">
+				<img src="arrow.png" class="img_стрілка" >
+				<img src="важіль.png" class="img_важель" >
+				<img src="стрілка в нутрі.png" class="img_мала_стрілка" >   
+				<img src="detal1.png " class="img_рухома_частина_столика">
+				<img src="ваги.png" class="img_ваги">
+				<img src="detal2.png" class="img_столик">   
+				<img src="Ваги2.png" class="img_ваги_з_краплею">   
+			</div>
+			<!-- встановлення таблиці яка показує данні -->
+			<div class="block row">
+				<table>
+					<tr>
+						<th rowspan="2">№</th>
+						<th colspan="2" id="tb1">Distilled water</th>
+						<th colspan="2" id="tb2" >Alcohol</th>
+						<th rowspan="2" >α<sub>0</sub>, N/m</th>
+						<th rowspan="2" >t, <sup><i>⸰</i></sup>C</th>
+					</tr>
+					<tr>
+						<td id="td1_1">F<sub>1</sub>, mgf</td>
+						<td id="td2_1">P<sub>0</sub>, mg</td>
+						<td id="td1_2">F<sub>2</sub>, mgf</td>
+						<td id="td2_2">P<sub>x</sub>, mg</td>
+					</tr>
+					<tr>
+						<td> 1 </td>
+						<td id="1_1"></td>
+						<td rowspan="10" id="1">  </td>
+						<td id="2_1"></td>
+						<td rowspan="10" id="2">  </td>
+						<td rowspan="10"> 0,07208 </td>
+						<td rowspan="10"> 23 </td>
+					</tr>
+					<tr>
+						<td> 2 </td>
+						<td id="1_2"></td>
+						<td id="2_2"></td>
+					</tr>
+					<tr>
+						<td> 3 </td>
+						<td id="1_3"></td>
+						<td id="2_3"></td>
+					</tr>
+					<tr>
+						<td> 4 </td>
+						<td id="1_4"></td>
+						<td id="2_4"></td>
+					</tr>
+					<tr>
+						<td> 5 </td>
+						<td id="1_5"></td>
+						<td id="2_5"></td>
+					</tr>
+					<tr>
+						<td> 6 </td>
+						<td id="1_6"></td>
+						<td id="2_6"></td>
+					</tr>
+					<tr>
+						<td> 7 </td>
+						<td id="1_7"></td>
+						<td id="2_7"></td>
+					</tr>
+					<tr>
+						<td> 8 </td>
+						<td id="1_8"></td>
+						<td id="2_8"></td>
+					</tr><tr>
+						<td> 9 </td>
+						<td id="1_9"></td>
+						<td id="2_9"></td>
+					</tr>
+					<tr>
+						<td> 10 </td>
+						<td id="1_10"></td>
+						<td id="2_10"></td>
+					</tr>
+				</table>
+			</div>
+			    	
+		</div>
+
+	</div>
+
+</body>
+
+<script>
+	//українською мовою
+	$("#language_switch").on("change", (e) => {
+		if ($("#language_switch").prop('checked')) {
+			titleText.innerText = "ВИВЧЕННЯ ПОВЕРХНЕВОГО НАТЯГУ РІДИНИ";
+			$("#i1").attr("src", "Скрін1_2.png");
+			$("#i2").attr("src", "Скрін2_2.png");
+			b1.innerText = "Дистильована вода"
+			b2.innerText = "Алкоголь"
+			b3.innerText = "Сила натягу"
+			b4.innerText = "Вага краплі"
+			tb1.innerText = "Дистильована вода"
+			tb2.innerText = "Алкоголь"
+		}
+		//Англійською мовою
+		if (!($("#language_switch").prop('checked'))) {
+			titleText.innerText = "STUDY OF SURFACE TENSION OF THE LIQUID";
+			$("#i1").attr("src", "Скрін1_1.png");
+			$("#i2").attr("src", "Скрін2_1.png");
+			b1.innerText = "Distilled water"
+			b2.innerText = "Alcohol"
+			b3.innerText = "Tension force"
+			b4.innerText = "Weight of drop"
+			tb1.innerText = "Distilled water"
+			tb2.innerText = "Alcohol"
+		}
+	})
+	//Створив даний код ще той умелец Салецький Олександр Вікторович
+</script>
+</html>
